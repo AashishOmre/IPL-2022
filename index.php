@@ -16,9 +16,28 @@
   
   //alert msg for sucessful insertion
   $inserted=false;
+  $deleted=false;
+  $updated=false;
 
   $sql=" SELECT* FROM `match_table`";
   $result1=mysqli_query($con,$sql); 
+
+  if(isset($_GET['delete'])){
+    $matchid=$_GET['delete'];
+    //echo $matchid;
+
+    $sql="DELETE FROM match_table WHERE `match_table`.`match_id` =$matchid;";
+
+    $result=mysqli_query($con,$sql);
+      if($result)  {
+        $deleted=true;
+
+      }
+      else{
+         //echo "not done";
+      }   
+
+  }
    
   if($_SERVER['REQUEST_METHOD']=='POST'){
     //  console.log(isset($_POST['editaddbtn']));
@@ -31,16 +50,15 @@
       $k = $_POST['editaddbtn']; 
       $sql="UPDATE `match_table` SET `match_id` = '$matchid', `venue` = '$venue', `team1_id` = '$t1', `team2_id` = '$t2' WHERE `match_table`.`match_id` = $k;";
 
-      // echo `editaddbtn.value`;
-
-    
       $result=mysqli_query($con,$sql);
       if($result)  {
+       
+        $updated=true;
         // echo "done",$k ;
-        header("Refresh:0");
+        
       }
       else{
-        echo "NOT done",$k ;
+       // echo "NOT done",$k ;
       }            
 
     }
@@ -57,7 +75,7 @@
      if($result){
       //echo "sucessfully established 1";
       $inserted=true;
-      header("Refresh:0");
+     // header("Refresh:0");
      }
      else{
      // echo "Not established !! 2"; 
@@ -65,7 +83,6 @@
     }
   }
 
-  
   ?>
 
 <!doctype html>
@@ -182,11 +199,31 @@
 </nav>
 
   <?php
+   
         if($inserted){
+          //header("Refresh:0");
           echo "<div class='alert alert-success' role='alert'>
-          <strong>Sucess !!</strong>record has been inserted sucessfully
-          </div>";
-             }
+          <strong>sucess !</strong>Record has been inserted sucessfully.
+        </div>";
+
+        }
+       ?>
+
+<?php
+
+        if($updated){
+          echo "<div class='alert alert-success' role='alert'>
+          <strong>sucess !</strong>Record has been updated sucessfully.
+        </div>";
+        }
+       ?>
+
+<?php
+        if($deleted){      
+          echo "<div class='alert alert-success' role='alert'>
+          <strong>sucess !</strong>Record has been deleted sucessfully.
+        </div>";
+        }
        ?>
 
   <div class="container my-3">
@@ -226,7 +263,9 @@
           </td>
           <td>
             <?php
-          echo "<button class='edit btn btn-primary my-1 w-15 p-1' id=".$rows['match_id'].">Edit</button> <button class='btn btn-primary my-1w-15 p-1 '>Delete</button>";
+          echo "<button class='edit btn btn-primary my-1 w-15 p-1' id=".$rows['match_id'].">Edit</button> 
+
+          <button class='delete1 btn btn-primary my-1w-15 p-1 ' id=d".$rows['match_id'].">Delete</button>";
            ?>
           </td>
         </tr>
@@ -267,17 +306,31 @@
                 let t1 = tr.getElementsByTagName('td')[3].innerText;
                 let t2 = tr.getElementsByTagName('td')[4].innerText;
               
-                
                 matchidedit.value=match_id1;
                 venueedit.value=venue;
                 t1edit.value=t1;
                 t2edit.value=t2;
-                // console.log(srNo, match_id, venue, t1, t2);
-
+                
                 $('#editModal').modal('toggle');
                  console.log(element.target.id);
                  editaddbtn.value=element.target.id;
-                
+
+              })
+            });
+ 
+            let delete1 = document.getElementsByClassName('delete1');
+            Array.from(delete1).forEach((element) => {
+              element.addEventListener('click', (element) => {
+                let matchid=element.target.id.substr(1,);
+
+                if(confirm("Are you sure? You want to delete this record")){
+                         //console.log($matchid);
+
+                         window.location=`/IPL-2022/index.php?delete=${matchid}`;
+                }
+                else{
+                       // console.log("NO");
+                }
               })
             });
 
@@ -287,12 +340,6 @@
                })
 
 
-          </script>
-          <!-- Option 2: Separate Popper and Bootstrap JS -->
-          <!--
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
-    -->
+          </script>        
 </body>
-
 </html>
